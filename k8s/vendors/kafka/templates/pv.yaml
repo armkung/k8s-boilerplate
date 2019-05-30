@@ -1,0 +1,43 @@
+{{- if .Values.kafka.persistence.enabled }}
+{{- range $index := until (.Values.kafka.replicas | int) }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kafka-{{ $index }}
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: kafka-storage
+  hostPath:
+    path: /data/kafka-{{ $index }}
+  claimRef:
+    namespace: {{ $.Release.Namespace }}
+    name: datadir-kafka-{{ $index }}
+---
+{{- end }}
+{{- end }}
+
+{{- if .Values.kafka.zookeeper.persistence.enabled }}
+{{- range $index := until (.Values.kafka.zookeeper.replicaCount | int)  }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: zookeeper-{{ $index }}
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: zookeeper-storage
+  hostPath:
+    path: /data/zookeeper-{{ $index }}
+  claimRef:
+    namespace: {{ $.Release.Namespace }}
+    name: data-zookeeper-{{ $index }}
+---
+{{- end }}
+{{- end }}

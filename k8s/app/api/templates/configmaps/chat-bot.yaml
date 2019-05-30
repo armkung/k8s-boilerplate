@@ -1,0 +1,17 @@
+{{- $_ := set $ "service" (merge dict .Values.services.chat-bot) }}
+{{- range $version, $image := $.service.version }}
+{{- $_ := set $.service "tag" $image.tag }}
+{{- $_ := set $.service "version" $version }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  {{- include "configmap.labels" $ }}
+data:
+  MYSQL_USER: admin
+  MYSQL_PASSWORD: admin
+  MYSQL_PORT: 3306
+  MYSQL_DB: data
+
+  CHANNEL_ACCESS_TOKEN: 1fTEgI9HjKV3PfVLhoNMEMZwDPEF1Zm+A3thQgD9pfsIQOF1YLOXvp0KSBt/2i6Qi4qh3YHx12EmnLuhUqXHQugmih6n5096+L6CCuFOFDuf5HCSwzRuYLXcMsmFZFuzSaWqyTR1YF5vhFMFlSbUFFGUYhWQfeY8sLGRXgo3xvw=
+  CHANNEL_SECRET: be6a6bb506794869a67b1900a9aa249a
+{{- end }}

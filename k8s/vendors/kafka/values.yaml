@@ -1,0 +1,40 @@
+kafka:
+  persistence:
+    enabled: true
+    storageClass: kafka-storage
+  terminationGracePeriodSeconds: 30
+  zookeeper:
+    persistence:
+      enabled: false
+      storageClass: zookeeper-storage
+
+kafka-manager:
+  nameOverride: manager
+  zkHosts: kafka-zookeeper:2181
+  ingress:
+    enabled: true
+    path: /
+    hosts:
+      - k8s-kafka
+  basicAuth:
+    enabled: true
+    username: admin
+    password: 1q2w3e4r
+  clusters:
+    - name: "default"
+      # Cluster zookeeper hosts. It will default to the
+      # Kafka-manager zookeeper hosts if not specified
+      #
+      zkHosts: ""
+      kafkaVersion: ""
+      jmxEnabled: ""
+      jmxUser: ""
+      jmxPass: ""
+      jmxSsl: ""
+      logkafkaEnabled: ""
+      pollConsumers: ""
+      filterConsumers: ""
+      activeOffsetCacheEnabled: ""
+      displaySizeEnabled: ""
+      securityProtocol: ""
+      tuning: {}

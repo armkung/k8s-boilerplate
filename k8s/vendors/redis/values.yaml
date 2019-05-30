@@ -1,0 +1,26 @@
+redis:
+  usePassword: false
+  image:
+    repository: bitnami/redis
+    tag: 5.0-debian-9
+  cluster:
+    slaveCount: 2
+  sentinel:
+    enabled: false
+    image:
+      repository: bitnami/redis-sentinel
+      tag: 5.0-debian-9
+  master:
+    persistence:
+      enabled: true
+      storageClass: redis-master-storage
+  slave:
+    persistence:
+      enabled: true
+      storageClass: redis-slave-storage
+  securityContext:
+    enabled: true
+    fsGroup: 1000
+    runAsUser: 1000
+  volumePermissions:
+    enabled: true

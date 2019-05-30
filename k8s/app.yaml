@@ -1,0 +1,155 @@
+apiVersion: skaffold/v1beta11
+kind: Config
+# build:
+#   artifacts:
+#     - image: gcr.io/k8s-skaffold/example
+#       context: .
+#       docker:
+#         buildArgs: []
+#   local:
+#     push: false
+#     useDockerCLI: false
+deploy:
+  helm:
+    releases: 
+      - name: app-deployment
+        chartPath: app/deployment
+        namespace: default
+      - name: www
+        chartPath: app/www
+      - name: api
+        chartPath: app/api
+profiles:
+  - name: local
+    deploy:
+      helm:
+        flags:
+          global:
+            - --kube-context=local
+            - --tiller-namespace=local
+        releases:
+          - name: api
+            chartPath: api
+            namespace: local
+            setValues:
+              release: local
+  - name: dev
+    patches:
+      - op: replace
+        path: /deploy/helm/releases/0/name
+        value: app-deployment-dev
+      - op: add
+        path: /deploy/helm/releases/0/values
+        value:
+          release: dev
+          revision: master
+      - op: replace
+        path: /deploy/helm/releases/1/name
+        value: www-dev
+      - op: add
+        path: /deploy/helm/releases/1/valuesFiles
+        value: 
+          - app/www/values.yaml
+      - op: add
+        path: /deploy/helm/releases/1/namespace
+        value: dev
+      - op: replace
+        path: /deploy/helm/releases/2/name
+        value: api-dev
+      - op: add
+        path: /deploy/helm/releases/2/valuesFiles
+        value: 
+          - app/api/values.yaml
+      - op: add
+        path: /deploy/helm/releases/2/namespace
+        value: dev
+  - name: sit
+    patches:
+      - op: replace
+        path: /deploy/helm/releases/0/name
+        value: app-deployment-sit
+      - op: add
+        path: /deploy/helm/releases/0/values
+        value:
+          release: sit
+          revision: master
+      - op: replace
+        path: /deploy/helm/releases/1/name
+        value: www-sit
+      - op: add
+        path: /deploy/helm/releases/1/valuesFiles
+        value: 
+          - app/www/values-sit.yaml
+      - op: add
+        path: /deploy/helm/releases/1/namespace
+        value: sit
+      - op: replace
+        path: /deploy/helm/releases/2/name
+        value: api-sit
+      - op: add
+        path: /deploy/helm/releases/2/valuesFiles
+        value: 
+          - app/api/values-sit.yaml
+      - op: add
+        path: /deploy/helm/releases/2/namespace
+        value: sit
+  - name: uat
+    patches:
+      - op: replace
+        path: /deploy/helm/releases/0/name
+        value: app-deployment-uat
+      - op: add
+        path: /deploy/helm/releases/0/values
+        value:
+          release: uat
+          revision: master
+      - op: replace
+        path: /deploy/helm/releases/1/name
+        value: www-uat
+      - op: add
+        path: /deploy/helm/releases/1/valuesFiles
+        value: 
+          - app/www/values-uat.yaml
+      - op: add
+        path: /deploy/helm/releases/1/namespace
+        value: uat
+      - op: replace
+        path: /deploy/helm/releases/2/name
+        value: api-uat
+      - op: add
+        path: /deploy/helm/releases/2/valuesFiles
+        value: 
+          - app/api/values-uat.yaml
+      - op: add
+        path: /deploy/helm/releases/2/namespace
+        value: uat
+  - name: prod
+    patches:
+      - op: replace
+        path: /deploy/helm/releases/0/name
+        value: app-deployment-prod
+      - op: add
+        path: /deploy/helm/releases/0/values
+        value:
+          release: prod
+          revision: master
+      - op: replace
+        path: /deploy/helm/releases/1/name
+        value: www-prod
+      - op: add
+        path: /deploy/helm/releases/1/valuesFiles
+        value: 
+          - app/www/values-prod.yaml
+      - op: add
+        path: /deploy/helm/releases/1/namespace
+        value: prod
+      - op: replace
+        path: /deploy/helm/releases/2/name
+        value: api-prod
+      - op: add
+        path: /deploy/helm/releases/2/valuesFiles
+        value: 
+          - app/api/values-prod.yaml
+      - op: add
+        path: /deploy/helm/releases/2/namespace
+        value: prod

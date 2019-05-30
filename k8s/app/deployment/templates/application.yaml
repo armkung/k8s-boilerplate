@@ -1,0 +1,39 @@
+{{- range $chart := .Values.charts }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $chart.name }}-{{ $.Values.release }}
+spec:
+  source:
+    repoURL: {{ $.Values.repo }}
+    targetRevision: {{ $.Values.revision }}
+    path: {{ $chart.path }}
+    helm:
+      parameters:
+        - name: release
+          value: {{ $.Values.release }}
+      valueFiles:
+        - values.yaml
+        {{- if not (eq $chart.name "app-deployment") }}
+        {{- if $.Values.release }}
+        {{- if not (eq $.Values.release "dev") }}
+        - values-{{ $.Values.release }}.yaml
+        {{- end }}
+        {{- end }}
+        {{- end }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ default $.Values.release $chart.namespace }}
+  syncPolicy:
+    automated:
+      prune: true
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+        {{- if has $.Values.release (list "dev" "sit") }}
+        - /spec/template/spec/containers/0/image
+        {{- end }}
+---
+{{- end }}
