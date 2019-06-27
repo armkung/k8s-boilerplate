@@ -74,13 +74,13 @@ spec:
               containerPort: {{ $port }}
               protocol: TCP
             {{- end }}
-          resources:
-            requests:
-              memory: "100Mi"
-              cpu: "10m"
-            limits:
-              memory: "300Mi"
-              cpu: "30m"
+          # resources:
+          #   requests:
+          #     memory: "100Mi"
+          #     cpu: "10m"
+          #   limits:
+          #     memory: "300Mi"
+          #     cpu: "30m"
           {{- if $.service.health }}
           livenessProbe:
             {{- if $.service.health.path }}
@@ -108,18 +108,7 @@ spec:
             periodSeconds: 60
             failureThreshold: 20
           {{- end }}
-      {{- if eq $.Values.release "prod" }}
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                topologyKey: kubernetes.io/hostname
-                labelSelector:
-                  matchLabels:
-                    name: {{ $.service.name }}
-{{- include "labels.info" $ | indent 18 }}
-      {{- end }}
+
       {{- if $nodeSelector }}
       {{- if eq (index $nodeSelector "kubernetes.io/os" | default "") "windows" }}
       {{- if eq (index $nodeSelector "beta.kubernetes.io/os" | default "") "windows" }}

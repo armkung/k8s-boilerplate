@@ -10,7 +10,7 @@ metadata:
     release: {{ $.Values.release }}
   annotations:
     ingress.kubernetes.io/priority: "2"
-    ingress.kubernetes.io/request-modifier: "ReplacePathRegex: ^(/preview|)(/(v[0-9a-z.-]+)|/latest|)(.*) $4"
+    ingress.kubernetes.io/rule-type: PathPrefixStrip
 spec:
   rules:
   - http:
@@ -18,29 +18,10 @@ spec:
       {{- range $service := .Values.services }}
       {{- $_ := set $ "service" (merge dict $service) }}
       {{- if and $service.enabled $service.ingress.enabled }}
-      - path: /{service:(latest/|){{ template "path-name" $ }}}
+      - path: /{{ template "path-name" $ }}
         backend:
           serviceName: {{ template "service-name" $.service }}
           servicePort: {{  $service.ingress.port }}
-       {{- if index $service "version" $service.latestVersion "blueGreen" }}
-      - path: /preview{service:(/latest/|){{ template "path-name" $ }}}
-        backend:
-          serviceName: {{ template "service-name" $.service }}-preview
-          servicePort: {{ $service.ingress.port }}
-      {{- end }}
-      {{- range $version, $image := $service.version }}
-      {{- $_ := set $.service "currentVersion" $version }}
-      - path: /{{ $version }}/{service:{{ template "path-name" $ }}}
-        backend:
-          serviceName: {{ template "service-name" $.service }}
-          servicePort: {{ $service.ingress.port }}
-       {{- if $image.blueGreen }}
-      - path: /preview/{{ $version }}/{service:{{ template "path-name" $ }}}
-        backend:
-          serviceName: {{ template "service-name" $.service }}-preview
-          servicePort: {{ $service.ingress.port }}
-      {{- end }}
-      {{- end }}
       {{- end }}
       {{- end }}
     {{- if .Values.host }}

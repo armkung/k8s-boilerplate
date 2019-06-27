@@ -7,6 +7,9 @@ traefik:
     type: Recreate
   serviceType: LoadBalancer
   externalTrafficPolicy: "Local"
+  service:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: nlb
   replicas: 1
   nodeSelector:
     beta.kubernetes.io/os: linux
@@ -39,7 +42,7 @@ traefik:
       samplingParam: "1.0"
   dashboard:
     enabled: true
-    domain: ""
+    domain: "k8s-traefik"
   metrics:
     prometheus:
       enabled: true
@@ -80,6 +83,12 @@ traefik:
             labelSelector:
               matchLabels:
                 app: traefik
+  dashboard:
+    enabled: true
+    domain: ""
+  metrics:
+    prometheus:
+      enabled: true                
   # tracing:
   #   enabled: true
   #   backend: jaeger

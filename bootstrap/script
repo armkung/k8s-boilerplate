@@ -1,0 +1,17 @@
+aws --region ap-southeast-1 eks get-token --cluster-name AUWRITE2
+
+eksctl create nodegroup \
+--cluster AUWRITE3 \
+--version auto \
+--name workers \
+--node-type t3.small \
+--node-ami auto \
+--nodes 2
+
+eksctl create cluster \
+--name AUWRITE3 \
+--version 1.13 \
+--nodegroup-name workers \
+--node-type t3.small \
+--nodes 2 \
+--node-ami auto

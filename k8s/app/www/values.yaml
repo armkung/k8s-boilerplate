@@ -1,29 +1,44 @@
 release: dev
-host: k8s-dev
+host: ""
 
-# nodeSelector:
-#   kubernetes.io/os: windows
 keel:
   enabled: true
-  policy: all
+  policy: force
   pollSchedule: "@every 1m"
 
-main: app
+main: ""
 services:
-  app:
+  one:
     enabled: true
     hasConfigMap: false
     hasSecret: false
-    name: demo
+    name: one
     tier: frontend
-    repository: armkung/demo
+    repository: appmanagm/kie-poc
     version:
       v1:
-        tag: 0.0.1
+        tag: latest
     latestVersion: v1
     ingress:
       enabled: true
       port: http
     port:
-      http: 80
+      http: 8090
+  two:
+    enabled: true
+    hasConfigMap: false
+    hasSecret: false
+    name: two
+    tier: frontend
+    replicas: 2
+    repository: appmanagm/kie-poc
+    version:
+      v1:
+        tag: latest
+    latestVersion: v1
+    ingress:
+      enabled: true
+      port: http
+    port:
+      http: 8090      
    
