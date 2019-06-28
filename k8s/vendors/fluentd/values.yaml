@@ -1,4 +1,7 @@
 fluentd:
+  image:
+    repository: appmanagm/fluentd
+    tag: 2.0.0
   service:
     type: NodePort
     nodePort: 31000
@@ -6,12 +9,21 @@ fluentd:
       - name: http
         protocol: TCP
         containerPort: 8080
+  replicaCount: 2
+  persistence:
+    enabled: true
+  # env:
+  #   HOST: 
+  #   PORT: 5432
+  #   DB_NAME: 
+  #   DB_USERNAME: admin
+  #   DB_PASSWORD: 1q2w3e4r
   configMaps:
-    general.conf: |
+    system.conf: |
       <system>
+        # workers 2
         log_level debug
       </system>
-    system.conf: |
     forward-input.conf: |
       <source>
         @type http
@@ -19,23 +31,53 @@ fluentd:
         port 8080
         body_size_limit 32m
         keepalive_timeout 10s
+        <parse>
+          @type multi_format
+          <pattern>
+            format json
+            time_key RequestTime
+            time_format %iso8601
+            keep_time_key true
+          </pattern>
+        </parse>
       </source>
     output.conf: |
-      <match fluent.**>
-        @type null
-      </match>
-
       <match **>
-        @type forward
-        send_timeout 60s
-        recover_wait 10s
-        hard_timeout 60s
-
-        <server>
-          name slack-gateway
-          host slack-gateway-svc.argo-events
-          port 12000
-          weight 60
-        </server>
+        @type route
+        <route **>
+          copy
+          @label @DB
+        </route>
       </match>
-          
+
+      <label @DB>
+        <match **>
+          @type stdout
+        </match>
+        # <match **>
+        #   @type sql
+        #   adapter postgresql
+        #   host "#{ENV['HOST']}"
+        #   port "#{ENV['PORT']}"
+        #   database "#{ENV['DB_NAME']}"
+        #   username "#{ENV['DB_USERNAME']}"
+        #   password "#{ENV['DB_PASSWORD']}"
+
+        #   <table>
+        #     table InternalServiceLogs
+        #     column_mapping 'AspNetRequestId,ApplicationNo,RemoteEndpoint,RequestTime,RequestBody,RequestHeaders,ResponseTime,ResponseBody,StatusCode,ErrorException,ServiceName,ServiceKind'
+        #   </table>
+
+        #   <buffer tag>
+        #     @type file
+        #     path /var/log/fluentd-buffers/db.buffer
+        #     flush_mode interval
+        #     flush_interval 10s
+        #     retry_type exponential_backoff
+        #     flush_thread_count 2
+        #     retry_forever
+        #     retry_wait 10s
+        #     overflow_action block
+        #   </buffer>
+        # </match>
+      </label>

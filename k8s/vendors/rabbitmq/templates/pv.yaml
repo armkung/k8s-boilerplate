@@ -1,0 +1,22 @@
+
+{{- if .Values.rabbitmq.persistence.enabled }}
+{{- range $index := until (.Values.rabbitmq.replicas | int) }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rabbitmq-{{ $index }}
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  claimRef:
+    namespace: {{ $.Release.Namespace }}
+    name: data-rabbitmq-{{ $index }}    
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  hostPath:
+    path: /data/rabbitmq-{{ $index }}
+---
+{{- end }}
+{{- end }}

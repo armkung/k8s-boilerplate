@@ -7,9 +7,6 @@ deploy:
         chartPath: vendors/argo
         namespace: default
         remote: true
-      - name: vendors-deployment
-        chartPath: vendors/deployment
-        namespace: default
       - name: traefik
         chartPath: vendors/traefik
         namespace: traefik
@@ -26,6 +23,18 @@ deploy:
         chartPath: vendors/heapster
         namespace: kube-system
         remote: true
+      - name: rabbitmq
+        chartPath: vendors/rabbitmq
+        namespace: rabbitmq
+        remote: true
+      - name: tracing
+        chartPath: vendors/tracing
+        namespace: tracing
+        remote: true
+      - name: fluentd
+        chartPath: vendors/fluentd
+        namespace: logging
+        remote: true                
 profiles:
   - name: dev
     patches:

@@ -1,0 +1,12 @@
+{{- $_ := set $ "service" (merge dict .Values.services.chatbot) }}
+{{- range $version, $image := $.service.version }}
+{{- $_ := set $.service "tag" $image.tag }}
+{{- $_ := set $.service "version" $version }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  {{- include "configmap.labels" $ }}
+data:
+  DATABASE_NAME: chatbot
+  DEFAULT_BOT_LANGUAGE: th
+{{- end }}

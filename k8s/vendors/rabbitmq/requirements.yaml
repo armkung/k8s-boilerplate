@@ -1,0 +1,5 @@
+dependencies:
+  - name: rabbitmq
+    version: 6.1.0
+    repository: '@stable'
+  

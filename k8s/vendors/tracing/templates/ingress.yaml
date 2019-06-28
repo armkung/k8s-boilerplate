@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: tracing
+  namespace: tracing
+  annotations:
+    ingress.kubernetes.io/auth-type: "basic"
+    ingress.kubernetes.io/auth-secret: "basic-auth"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /admin/tracing
+        backend:
+          serviceName: jaeger-tracing-query
+          servicePort: 16686

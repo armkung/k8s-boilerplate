@@ -1,0 +1,19 @@
+rabbitmq:
+  rabbitmq:
+    username: admin
+    password: 1q2w3e4r
+    plugins: "rabbitmq_management rabbitmq_peer_discovery_k8s"
+    # extraConfiguration: |-
+    #   management.path_prefix = /admin/mq
+  persistence:
+    storageClass: local-storage
+  volumePermissions:
+    enabled: true
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+  ingress:
+    enabled: true
+    hostName: k8s-mq
+    path: /

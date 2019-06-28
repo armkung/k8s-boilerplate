@@ -12,6 +12,9 @@ spec:
   storageClassName: redis-master-storage
   hostPath:
     path: /data/redis-master-0
+  claimRef:
+    namespace: {{ $.Release.Namespace }}
+    name: redis-data-redis-master-{{ $index }}
 ---
 {{- end }}
 
@@ -30,6 +33,9 @@ spec:
   storageClassName: redis-slave-storage
   hostPath:
     path: /data/redis-slave-{{ $index }}
+  claimRef:
+    namespace: {{ $.Release.Namespace }}
+    name: redis-data-redis-slave-{{ $index }}
 ---
 {{- end }}
 {{- end }}
