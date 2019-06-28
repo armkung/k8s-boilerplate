@@ -1,4 +1,4 @@
-repo: https://github.com/armkung/k8s-window.git
+repo: https://github.com/appman-agm/agentmate-chatbot-infra.git
 revision: master
 charts:
   - name: app-deployment

@@ -18,6 +18,7 @@ kind: Deployment
 metadata:
   {{- include "deployment.labels" $ }}
 spec:
+  revisionHistoryLimit: 5
   {{- if eq $.Values.release "prod" }}
   replicas: {{ $.service.replicas | default 2 }}
   {{- else }}

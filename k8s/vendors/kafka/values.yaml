@@ -1,4 +1,5 @@
 kafka:
+  replicas: 3
   persistence:
     enabled: true
     storageClass: kafka-storage
@@ -7,7 +8,14 @@ kafka:
     persistence:
       enabled: false
       storageClass: zookeeper-storage
-
+  external:
+    enabled: true
+    servicePort: 9092
+  configurationOverrides:
+    "advertised.listeners": |-
+      EXTERNAL://kafka.cluster.local:$((31090 + ${KAFKA_BROKER_ID}))
+    "listener.security.protocol.map": |-
+      PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
 kafka-manager:
   nameOverride: manager
   zkHosts: kafka-zookeeper:2181

@@ -349,102 +349,71 @@ spec:
   scope: Namespaced
   version: v1beta1
 ---
-apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  labels:
-    kubeless: kafka-trigger-controller
-  name: kafka-trigger-controller
-  namespace: {{ .Values.release }}
-spec:
-  selector:
-    matchLabels:
-      kubeless: kafka-trigger-controller
-  template:
-    metadata:
-      labels:
-        kubeless: kafka-trigger-controller
-    spec:
-      containers:
-      - image: bitnami/kafka-trigger-controller:latest
-        imagePullPolicy: IfNotPresent
-        name: kafka-trigger-controller
-        env:
-        - name: KUBELESS_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: KAFKA_BROKERS
-          value: kafka.kafka:9092
-      serviceAccountName: controller-acct
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: kafkatriggers.kubeless.io
-spec:
-  group: kubeless.io
-  names:
-    kind: KafkaTrigger
-    plural: kafkatriggers
-    singular: kafkatrigger
-  scope: Namespaced
-  version: v1beta1
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: kafka-controller-deployer
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: kafka-controller-deployer
-subjects:
-- kind: ServiceAccount
-  name: controller-acct
-  namespace: {{ .Values.release }}
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRole
-metadata:
-  name: kafka-controller-deployer
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - services
-  - configmaps
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - kubeless.io
-  resources:
-  - functions
-  - kafkatriggers
-  verbs:
-  - get
-  - list
-  - watch
-  - update
-  - delete
----
-# apiVersion: v1
-# kind: ServiceAccount
+# apiVersion: apps/v1beta1
+# kind: Deployment
 # metadata:
-#   name: kubeless-ui
+#   labels:
+#     kubeless: kafka-trigger-controller
+#   name: kafka-trigger-controller
+#   namespace: {{ .Values.release }}
+# spec:
+#   selector:
+#     matchLabels:
+#       kubeless: kafka-trigger-controller
+#   template:
+#     metadata:
+#       labels:
+#         kubeless: kafka-trigger-controller
+#     spec:
+#       containers:
+#       - image: bitnami/kafka-trigger-controller:latest
+#         imagePullPolicy: IfNotPresent
+#         name: kafka-trigger-controller
+#         env:
+#         - name: KUBELESS_NAMESPACE
+#           valueFrom:
+#             fieldRef:
+#               fieldPath: metadata.namespace
+#         - name: KAFKA_BROKERS
+#           value: kafka.kafka:9092
+#       serviceAccountName: controller-acct
+# ---
+# apiVersion: apiextensions.k8s.io/v1beta1
+# kind: CustomResourceDefinition
+# metadata:
+#   name: kafkatriggers.kubeless.io
+# spec:
+#   group: kubeless.io
+#   names:
+#     kind: KafkaTrigger
+#     plural: kafkatriggers
+#     singular: kafkatrigger
+#   scope: Namespaced
+#   version: v1beta1
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1beta1
+# kind: ClusterRoleBinding
+# metadata:
+#   name: kafka-controller-deployer
+# roleRef:
+#   apiGroup: rbac.authorization.k8s.io
+#   kind: ClusterRole
+#   name: kafka-controller-deployer
+# subjects:
+# - kind: ServiceAccount
+#   name: controller-acct
 #   namespace: {{ .Values.release }}
 # ---
 # apiVersion: rbac.authorization.k8s.io/v1beta1
 # kind: ClusterRole
 # metadata:
-#   name: kubeless-ui
+#   name: kafka-controller-deployer
 # rules:
 # - apiGroups:
 #   - ""
 #   resources:
-#   - pods
-#   - pods/log
+#   - services
+#   - configmaps
 #   verbs:
 #   - get
 #   - list
@@ -452,103 +421,134 @@ rules:
 #   - kubeless.io
 #   resources:
 #   - functions
+#   - kafkatriggers
 #   verbs:
 #   - get
 #   - list
 #   - watch
 #   - update
-#   - create
 #   - delete
-# - apiGroups:
-#   - ""
-#   resources:
-#   - services
-#   verbs:
-#   - get
-#   - list
-#   - proxy
-# - apiGroups:
-#   - ""
-#   resources:
-#   - services/proxy
-#   verbs:
-#   - get
-#   # the 'create' verb is required because otherwise POST requests are blocked
-#   - create
-#   - proxy
-# - apiGroups:
-#   - ""
-#   resources:
-#   - configmaps
-#   verbs:
-#   - get
 # ---
-# apiVersion: rbac.authorization.k8s.io/v1beta1
-# kind: ClusterRoleBinding
-# metadata:
-#   name: kubeless-ui
-# roleRef:
-#   apiGroup: rbac.authorization.k8s.io
-#   kind: ClusterRole
-#   name: kubeless-ui
-# subjects:
-# - kind: ServiceAccount
-#   name: kubeless-ui
-#   namespace: {{ .Values.release }}
-# ---
-# apiVersion: extensions/v1beta1
-# kind: Deployment
-# metadata:
-#   labels:
-#     controller: ui
-#   name: kubeless-ui
-#   namespace: {{ .Values.release }}
-# spec:
-#   replicas: 1
-#   selector:
-#     matchLabels:
-#      controller: ui
-#   template:
-#     metadata:
-#       labels:
-#         controller: ui
-#     spec:
-#       containers:
-#       - name: ui
-#         image: bitnami/kubeless-ui:latest
-#         imagePullPolicy: Always
-#         env:
-#           - name: KUBELESS_NAMESPACE
-#             valueFrom:
-#               fieldRef:
-#                 fieldPath: metadata.namespace
-#         ports:
-#         - containerPort: 3000
-#           protocol: TCP
-#       - name: proxy
-#         image: lachlanevenson/k8s-kubectl:v1.13.1
-#         imagePullPolicy: IfNotPresent
-#         args:
-#         - proxy
-#         - "-p"
-#         - "8080"
-#         imagePullPolicy: Always
-#       serviceAccountName: kubeless-ui
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   labels:
-#     controller: ui
-#   name: kubeless-ui
-#   namespace: {{ .Values.release }}
-# spec:
-#   ports:
-#   - name: ui-port
-#     port: 3000
-#     protocol: TCP
-#     targetPort: 3000
-#   selector:
-#     controller: ui
-#   sessionAffinity: None
-#   type: NodePort
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubeless-ui
+  namespace: {{ .Values.release }}
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: kubeless-ui
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - pods/log
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - kubeless.io
+  resources:
+  - functions
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - create
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - proxy
+- apiGroups:
+  - ""
+  resources:
+  - services/proxy
+  verbs:
+  - get
+  # the 'create' verb is required because otherwise POST requests are blocked
+  - create
+  - proxy
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: kubeless-ui
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubeless-ui
+subjects:
+- kind: ServiceAccount
+  name: kubeless-ui
+  namespace: {{ .Values.release }}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    controller: ui
+  name: kubeless-ui
+  namespace: {{ .Values.release }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+     controller: ui
+  template:
+    metadata:
+      labels:
+        controller: ui
+    spec:
+      containers:
+      - name: ui
+        image: bitnami/kubeless-ui:latest
+        imagePullPolicy: Always
+        env:
+          - name: KUBELESS_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+      - name: proxy
+        image: lachlanevenson/k8s-kubectl:v1.13.1
+        imagePullPolicy: IfNotPresent
+        args:
+        - proxy
+        - "-p"
+        - "8080"
+        imagePullPolicy: Always
+      serviceAccountName: kubeless-ui
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    controller: ui
+  name: kubeless-ui
+  namespace: {{ .Values.release }}
+spec:
+  ports:
+  - name: ui-port
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    controller: ui
+  sessionAffinity: None
+  type: NodePort

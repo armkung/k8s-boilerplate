@@ -1,0 +1,31 @@
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  name: jaeger-tracing
+  namespace: tracing
+spec:
+  strategy: allInOne
+  allInOne:
+    image: jaegertracing/all-in-one:1.12
+    options:
+      log-level: debug
+      query:
+        base-path: /admin/tracing
+  storage:
+    type: memory
+    options:
+      memory:
+        max-traces: 50000
+  sampling:
+    options:
+      service_strategies:
+        - service: jaeger-query
+          type: probabilistic
+          param: 0
+      default_strategy:
+        type: probabilistic
+        param: 0
+  agent:
+    strategy: DaemonSet
+  ingress:
+    enabled: false

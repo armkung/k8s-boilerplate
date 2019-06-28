@@ -12,13 +12,13 @@ kind: Config
 deploy:
   helm:
     releases: 
-      - name: app-deployment
-        chartPath: app/deployment
-        namespace: default
       - name: www
         chartPath: app/www
       - name: api
         chartPath: app/api
+      - name: app-deployment
+        chartPath: app/deployment
+        namespace: default
 profiles:
   - name: local
     deploy:
@@ -37,119 +37,119 @@ profiles:
     patches:
       - op: replace
         path: /deploy/helm/releases/0/name
-        value: app-deployment-dev
+        value: www-dev
       - op: add
-        path: /deploy/helm/releases/0/values
-        value:
-          release: dev
-          revision: master
+        path: /deploy/helm/releases/0/valuesFiles
+        value: 
+          - app/www/values.yaml
+      - op: add
+        path: /deploy/helm/releases/0/namespace
+        value: dev
       - op: replace
         path: /deploy/helm/releases/1/name
-        value: www-dev
+        value: api-dev
       - op: add
         path: /deploy/helm/releases/1/valuesFiles
         value: 
-          - app/www/values.yaml
+          - app/api/values.yaml
       - op: add
         path: /deploy/helm/releases/1/namespace
         value: dev
       - op: replace
         path: /deploy/helm/releases/2/name
-        value: api-dev
+        value: app-deployment-dev
       - op: add
-        path: /deploy/helm/releases/2/valuesFiles
-        value: 
-          - app/api/values.yaml
-      - op: add
-        path: /deploy/helm/releases/2/namespace
-        value: dev
+        path: /deploy/helm/releases/2/values
+        value:
+          release: dev
+          revision: master        
   - name: sit
     patches:
       - op: replace
         path: /deploy/helm/releases/0/name
-        value: app-deployment-sit
+        value: www-sit
       - op: add
-        path: /deploy/helm/releases/0/values
-        value:
-          release: sit
-          revision: master
+        path: /deploy/helm/releases/0/valuesFiles
+        value: 
+          - app/www/values-sit.yaml
+      - op: add
+        path: /deploy/helm/releases/0/namespace
+        value: sit
       - op: replace
         path: /deploy/helm/releases/1/name
-        value: www-sit
+        value: api-sit
       - op: add
         path: /deploy/helm/releases/1/valuesFiles
         value: 
-          - app/www/values-sit.yaml
+          - app/api/values-sit.yaml
       - op: add
         path: /deploy/helm/releases/1/namespace
         value: sit
       - op: replace
         path: /deploy/helm/releases/2/name
-        value: api-sit
+        value: app-deployment-sit
       - op: add
-        path: /deploy/helm/releases/2/valuesFiles
-        value: 
-          - app/api/values-sit.yaml
-      - op: add
-        path: /deploy/helm/releases/2/namespace
-        value: sit
+        path: /deploy/helm/releases/2/values
+        value:
+          release: sit
+          revision: master        
   - name: uat
     patches:
       - op: replace
         path: /deploy/helm/releases/0/name
-        value: app-deployment-uat
+        value: www-uat
       - op: add
-        path: /deploy/helm/releases/0/values
-        value:
-          release: uat
-          revision: master
+        path: /deploy/helm/releases/0/valuesFiles
+        value: 
+          - app/www/values-uat.yaml
+      - op: add
+        path: /deploy/helm/releases/0/namespace
+        value: uat
       - op: replace
         path: /deploy/helm/releases/1/name
-        value: www-uat
+        value: api-uat
       - op: add
         path: /deploy/helm/releases/1/valuesFiles
         value: 
-          - app/www/values-uat.yaml
+          - app/api/values-uat.yaml
       - op: add
         path: /deploy/helm/releases/1/namespace
         value: uat
       - op: replace
         path: /deploy/helm/releases/2/name
-        value: api-uat
+        value: app-deployment-uat
       - op: add
-        path: /deploy/helm/releases/2/valuesFiles
-        value: 
-          - app/api/values-uat.yaml
-      - op: add
-        path: /deploy/helm/releases/2/namespace
-        value: uat
+        path: /deploy/helm/releases/2/values
+        value:
+          release: uat
+          revision: master        
   - name: prod
     patches:
       - op: replace
         path: /deploy/helm/releases/0/name
-        value: app-deployment-prod
+        value: www-prod
       - op: add
-        path: /deploy/helm/releases/0/values
-        value:
-          release: prod
-          revision: master
+        path: /deploy/helm/releases/0/valuesFiles
+        value: 
+          - app/www/values-prod.yaml
+      - op: add
+        path: /deploy/helm/releases/0/namespace
+        value: prod
       - op: replace
         path: /deploy/helm/releases/1/name
-        value: www-prod
+        value: api-prod
       - op: add
         path: /deploy/helm/releases/1/valuesFiles
         value: 
-          - app/www/values-prod.yaml
+          - app/api/values-prod.yaml
       - op: add
         path: /deploy/helm/releases/1/namespace
         value: prod
       - op: replace
         path: /deploy/helm/releases/2/name
-        value: api-prod
+        value: app-deployment-prod
       - op: add
-        path: /deploy/helm/releases/2/valuesFiles
-        value: 
-          - app/api/values-prod.yaml
-      - op: add
-        path: /deploy/helm/releases/2/namespace
-        value: prod
+        path: /deploy/helm/releases/2/values
+        value:
+          release: prod
+          revision: master        

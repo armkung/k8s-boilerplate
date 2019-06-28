@@ -29,6 +29,28 @@ traefik:
   rbac:
     enabled: true
   # logLevel: error
+  tracing:
+    enabled: true
+    backend: jaeger
+    jaeger:
+      localAgentHostPort: jaeger-tracing-agent.tracing:6831
+      samplingServerUrl: http://jaeger-tracing-agent.tracing:5778/sampling
+      samplingType: "const"
+      samplingParam: "1.0"
+  dashboard:
+    enabled: true
+    domain: ""
+  metrics:
+    prometheus:
+      enabled: true
+  # env:
+  #   - name: JAEGER_AGENT_HOST
+  #     valueFrom:
+  #       fieldRef:
+  #         fieldPath: status.hostIP
+  # startupArguments:
+  #   - --tracing.jaeger.localagenthostport=$(JAEGER_AGENT_HOST):6831
+  #   - --tracing.jaeger.samplingserverurl=$(JAEGER_AGENT_HOST):5778/sampling
   debug:
     enabled: false
   accessLogs:
